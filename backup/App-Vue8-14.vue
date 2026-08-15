@@ -148,8 +148,8 @@
             <div class="flex justify-between items-center">
               <div class="flex items-center gap-3">
                 <span class="text-[12px] font-bold font-mono uppercase text-[#55555D]">Live Preview</span>
-                <!-- Typography / Font Style Selector -->
-<!-- Typography / Font Style Selector -->
+
+                <!-- Typography / Font Style Selector with Custom Theme Popup Options -->
                 <select v-model="activeFont" aria-label="Select typography style" class="text-[10px] font-bold font-mono rounded-lg px-3 py-1.5 focus:outline-none border border-[#C4C4C9] cursor-pointer [&>option]:bg-[#1E1E1E] [&>option]:text-white">
                   <option value="font-sans">Sans-Serif (Modern Clean)</option>
                   <option value="font-serif">Serif (Editorial Classic)</option>
@@ -202,11 +202,10 @@
                 </svg>
               </button>
 
-              <div class="space-y-6">
-                <h2 ref="titleRef" :contenteditable="isEditing" @input="e => previewTitle = e.target.innerText" class="font-bold text-3xl tracking-tight leading-tight outline-none rounded px-1 -mx-1">{{ previewTitle }}</h2>
-                <p :contenteditable="isEditing" @input="e => previewText = e.target.innerText" class="text-base opacity-95 leading-relaxed outline-none rounded px-1 -mx-1">
-                  {{ previewText }}
-                </p>
+              <!-- Added text-left and dir="ltr" to fix right-to-left typing bug -->
+              <div class="space-y-6 text-left" dir="ltr">
+                <h2 ref="titleRef" :contenteditable="isEditing" @input="e => previewTitle = e.target.innerText" class="font-bold text-3xl tracking-tight leading-tight outline-none rounded px-1 -mx-1 wrap-break-word overflow-hidden text-left" dir="ltr"></h2>
+                <p ref="bodyRef" :contenteditable="isEditing" @input="e => previewText = e.target.innerText" class="text-base opacity-95 leading-relaxed outline-none rounded px-1 -mx-1 wrap-break-word overflow-hidden text-left" dir="ltr"></p>
               </div>
 
             </div>
@@ -223,6 +222,8 @@
       </div>
     </main>
 
+    <Footer />
+
     <!-- Export Modal Component -->
     <ExportModal 
       :is-open="isModalOpen" 
@@ -235,26 +236,29 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import Header from './components/Header.vue'
+import Footer from './components/Footer.vue'
 import ExportModal from './components/ExportModal.vue'
 import { useColorTokens } from './composables/useColorTokens'
 import { useClipboard } from '@vueuse/core'
 
-const { 
-  bgColor, 
-  textColor, 
+const {
+  bgColor,
+  textColor,
   activeFont,
-  savedPalettes, 
-  setPreset, 
+  savedPalettes,
+  setPreset,
   resetToDefault,
-  saveCurrentPalette, 
-  deletePalette, 
+  saveCurrentPalette,
+  deletePalette,
   pickColorFor,
-  contrastRatio, 
-  isWcagAa, 
+  contrastRatio,
+  isWcagAa,
   isWcagAaa,
-  backgroundScale 
+  backgroundScale,
+  apcaContrast,
+  apcaRating
 } = useColorTokens()
 
 const { copy, copied } = useClipboard()
@@ -265,6 +269,7 @@ const isEditing = ref(false)
 const previewTitle = ref('Component Preview')
 const previewText = ref('Live testing for custom color pairings and legibility. Click here to edit and test your own words!')
 const titleRef = ref(null)
+const bodyRef = ref(null)
 
 const simModes = [
   { id: 'normal', name: 'Normal' },
@@ -280,6 +285,11 @@ const activeFilterStyle = computed(() => {
   return 'none'
 })
 
+onMounted(() => {
+  if (titleRef.value) titleRef.value.innerText = previewTitle.value
+  if (bodyRef.value) bodyRef.value.innerText = previewText.value
+})
+
 function toggleEdit() {
   isEditing.value = !isEditing.value
   if (isEditing.value && titleRef.value) {
@@ -292,4 +302,5 @@ function toggleEdit() {
 function openExportModal() {
   isModalOpen.value = true
 }
+
 </script>
