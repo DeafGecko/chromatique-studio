@@ -37,11 +37,13 @@ Dropdown to switch between Sans-Serif, Serif, and Monospace so you can see how f
 **Export Token Schema**
 When you find something you like, you can export it as CSS variables, a Tailwind config snippet, or W3C JSON. Copy button included.
 
+**APCA Contrast Meter**
+Alongside WCAG AA/AAA scores, the app calculates an APCA (Accessible Perceptual Contrast Algorithm) Lc score. WCAG's contrast ratio is a symmetric formula that doesn't model how human vision actually perceives lightness — it can pass pale-on-white pairs and fail dark-on-dark pairs that look fine in practice. APCA accounts for that more accurately and returns a directional score (0–100+) with a plain-language rating: Excellent, Good, OK, Weak, or Fail. Both scores are shown side by side so you can see where they agree and where they don't.
+
 ---
 
 ## What's coming next
 
-- **APCA Contrast Meter** — a more accurate way to measure contrast than the old WCAG math
 - **Contrast Fix Helper** — auto-suggests small tweaks to failing color pairs until they pass
 - **Component Switcher** — test your tokens on cards, badges, form inputs, and toggles inside the preview
 - **Typography Specimen** — see how your colors look across headings, body text, captions, and code
