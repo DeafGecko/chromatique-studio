@@ -89,6 +89,36 @@ export function useColorTokens() {
   const isWcagAa = computed(() => parseFloat(contrastRatio.value) >= 4.5)
   const isWcagAaa = computed(() => parseFloat(contrastRatio.value) >= 7.0)
 
+  function apcaLuminance(hex) {
+    const { r, g, b } = hexToRgb(hex)
+    const rs = Math.pow(r / 255, 2.4)
+    const gs = Math.pow(g / 255, 2.4)
+    const bs = Math.pow(b / 255, 2.4)
+    return 0.2126729 * rs + 0.7151522 * gs + 0.0721750 * bs
+  }
+
+  const apcaContrast = computed(() => {
+    try {
+      const lbg = apcaLuminance(bgColor.value)
+      const ltext = apcaLuminance(textColor.value)
+      const sapc = lbg > ltext
+        ? (Math.pow(lbg, 0.56) - Math.pow(ltext, 0.57)) * 1.14
+        : (Math.pow(lbg, 0.65) - Math.pow(ltext, 0.62)) * 1.14
+      return Math.abs(sapc * 100).toFixed(1)
+    } catch {
+      return '0.0'
+    }
+  })
+
+  const apcaRating = computed(() => {
+    const lc = parseFloat(apcaContrast.value)
+    if (lc >= 90) return 'Excellent'
+    if (lc >= 75) return 'Good'
+    if (lc >= 60) return 'OK'
+    if (lc >= 45) return 'Weak'
+    return 'Fail'
+  })
+
   function hexToRgb(hex) {
     let cleanHex = hex.replace('#', '')
     if (cleanHex.length === 3) {
@@ -137,6 +167,8 @@ export function useColorTokens() {
     contrastRatio,
     isWcagAa,
     isWcagAaa,
-    backgroundScale
+    backgroundScale,
+    apcaContrast,
+    apcaRating
   }
 }

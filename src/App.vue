@@ -117,13 +117,24 @@
             </div>
           </div>
 
-          <!-- Contrast Ratio & WCAG Badges -->
+          <!-- Contrast Ratio & WCAG + APCA Badges -->
           <div class="grid grid-cols-3 gap-4 pt-4 border-t border-[#C4C4C9]">
             <div class="col-span-2 bg-white p-5 rounded-2xl border border-[#C4C4C9]">
               <span class="block text-[12px] font-bold font-mono text-[#55555D] uppercase mb-1">Contrast Ratio</span>
               <span class="font-mono text-5xl font-extrabold tracking-tight text-[#111113] tabular-nums">
                 {{ contrastRatio }}<span class="text-3xl opacity-50">:1</span>
               </span>
+              <div class="mt-3 pt-3 border-t border-[#C4C4C9]">
+                <span class="block text-[9px] font-mono uppercase text-[#55555D] mb-1">APCA Lc</span>
+                <div class="flex items-baseline gap-2">
+                  <span class="font-mono text-2xl font-extrabold text-[#111113]">{{ apcaContrast }}</span>
+                  <span class="font-mono text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border border-[#C4C4C9]"
+                        :class="{
+                          'bg-[#111113] text-white border-[#111113]': apcaRating === 'Excellent' || apcaRating === 'Good',
+                          'bg-white text-[#111113]': apcaRating !== 'Excellent' && apcaRating !== 'Good'
+                        }">{{ apcaRating }}</span>
+                </div>
+              </div>
             </div>
 
             <div class="flex flex-col gap-2">
@@ -211,8 +222,73 @@
             </div>
           </div>
 
-          <div class="flex justify-end pt-4">
-            <button @click="openExportModal" 
+          <!-- Component Switcher -->
+          <div class="space-y-3 pt-4 border-t border-[#C4C4C9]">
+            <span class="text-[12px] font-bold font-mono uppercase text-[#55555D] block">Component Preview</span>
+            <div class="flex gap-2 flex-wrap">
+              <button v-for="c in componentPreviews" :key="c.id"
+                      @click="activeComponent = c.id"
+                      class="px-3 py-1.5 rounded-lg border text-[10px] font-mono font-semibold uppercase tracking-wider transition-colors"
+                      :class="activeComponent === c.id ? 'bg-[#111113] text-white border-[#111113]' : 'bg-white text-[#111113] border-[#C4C4C9] hover:bg-[#D8D8DC]'">
+                {{ c.label }}
+              </button>
+            </div>
+
+            <!-- Component renders -->
+            <div class="p-6 rounded-2xl border border-[#C4C4C9] bg-white flex items-center justify-center min-h-28">
+
+              <!-- Card -->
+              <div v-if="activeComponent === 'card'" class="w-full max-w-xs rounded-xl p-5 shadow-sm border border-[#C4C4C9]" :style="{ backgroundColor: bgColor, color: textColor }">
+                <p class="text-[10px] font-mono uppercase opacity-60 mb-1">Label</p>
+                <p class="font-bold text-lg leading-tight">Color Token Card</p>
+                <p class="text-sm opacity-80 mt-1">Preview text on your surface color.</p>
+              </div>
+
+              <!-- Badge -->
+              <div v-else-if="activeComponent === 'badge'" class="flex gap-2 flex-wrap justify-center">
+                <span class="px-3 py-1 rounded-full text-xs font-mono font-bold" :style="{ backgroundColor: bgColor, color: textColor }">Default</span>
+                <span class="px-3 py-1 rounded-full text-xs font-mono font-bold border" :style="{ borderColor: bgColor, color: bgColor }">Outline</span>
+                <span class="px-3 py-1 rounded-full text-xs font-mono font-bold" :style="{ backgroundColor: textColor, color: bgColor }">Inverted</span>
+              </div>
+
+              <!-- Button -->
+              <div v-else-if="activeComponent === 'button'" class="flex gap-3 flex-wrap justify-center">
+                <button class="px-5 py-2.5 rounded-xl text-sm font-mono font-bold shadow-sm" :style="{ backgroundColor: bgColor, color: textColor }">Primary</button>
+                <button class="px-5 py-2.5 rounded-xl text-sm font-mono font-bold border-2" :style="{ borderColor: bgColor, color: bgColor, backgroundColor: 'transparent' }">Outline</button>
+                <button class="px-5 py-2.5 rounded-xl text-sm font-mono font-bold" :style="{ backgroundColor: textColor, color: bgColor }">Inverted</button>
+              </div>
+
+              <!-- Input -->
+              <div v-else-if="activeComponent === 'input'" class="w-full max-w-xs space-y-2">
+                <label class="text-[10px] font-mono uppercase font-bold" :style="{ color: textColor }">Field Label</label>
+                <input type="text" placeholder="Placeholder text…"
+                       class="w-full px-4 py-2.5 rounded-xl text-sm font-mono border-2 outline-none"
+                       :style="{ backgroundColor: bgColor, color: textColor, borderColor: textColor + '40' }" />
+              </div>
+
+              <!-- Toggle -->
+              <div v-else-if="activeComponent === 'toggle'" class="flex items-center gap-4">
+                <span class="text-sm font-mono" :style="{ color: textColor }">Off</span>
+                <div class="w-12 h-6 rounded-full flex items-center px-1" :style="{ backgroundColor: bgColor, border: '2px solid ' + textColor }">
+                  <div class="w-4 h-4 rounded-full" :style="{ backgroundColor: textColor }"></div>
+                </div>
+                <div class="w-12 h-6 rounded-full flex items-center justify-end px-1" :style="{ backgroundColor: textColor }">
+                  <div class="w-4 h-4 rounded-full" :style="{ backgroundColor: bgColor }"></div>
+                </div>
+                <span class="text-sm font-mono" :style="{ color: textColor }">On</span>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Export & Share -->
+          <div class="flex justify-between items-center pt-4">
+            <button @click="copyShareUrl"
+                    class="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider px-4 py-2.5 rounded-xl border border-[#C4C4C9] bg-white hover:bg-[#D8D8DC] transition-colors">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
+              {{ shareCopied ? 'Copied!' : 'Share URL' }}
+            </button>
+            <button @click="openExportModal"
                     class="bg-[#111113] text-white hover:bg-[#333338] px-6 py-3 rounded-xl flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider shadow-sm">
               <span>Export Token Schema</span>
             </button>
@@ -236,30 +312,67 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import Header from './components/Header.vue'
 import Footer from './components/Footer.vue'
 import ExportModal from './components/ExportModal.vue'
 import { useColorTokens } from './composables/useColorTokens'
 import { useClipboard } from '@vueuse/core'
 
-const { 
-  bgColor, 
-  textColor, 
+const {
+  bgColor,
+  textColor,
   activeFont,
-  savedPalettes, 
-  setPreset, 
+  savedPalettes,
+  setPreset,
   resetToDefault,
-  saveCurrentPalette, 
-  deletePalette, 
+  saveCurrentPalette,
+  deletePalette,
   pickColorFor,
-  contrastRatio, 
-  isWcagAa, 
+  contrastRatio,
+  isWcagAa,
   isWcagAaa,
-  backgroundScale 
+  backgroundScale,
+  apcaContrast,
+  apcaRating
 } = useColorTokens()
 
 const { copy, copied } = useClipboard()
+
+// Shareable URL — read on mount, update on color change
+onMounted(() => {
+  const params = new URLSearchParams(window.location.search)
+  const bg = params.get('bg')
+  const text = params.get('text')
+  if (bg) bgColor.value = '#' + bg
+  if (text) textColor.value = '#' + text
+  if (titleRef.value) titleRef.value.innerText = previewTitle.value
+  if (bodyRef.value) bodyRef.value.innerText = previewText.value
+})
+
+watch([bgColor, textColor], ([bg, text]) => {
+  const params = new URLSearchParams()
+  params.set('bg', bg.replace('#', ''))
+  params.set('text', text.replace('#', ''))
+  window.history.replaceState(null, '', '?' + params.toString())
+})
+
+const shareUrl = computed(() => window.location.href)
+const shareCopied = ref(false)
+function copyShareUrl() {
+  copy(shareUrl.value)
+  shareCopied.value = true
+  setTimeout(() => { shareCopied.value = false }, 2000)
+}
+
+const activeComponent = ref('card')
+const componentPreviews = [
+  { id: 'card', label: 'Card' },
+  { id: 'badge', label: 'Badge' },
+  { id: 'button', label: 'Button' },
+  { id: 'input', label: 'Input' },
+  { id: 'toggle', label: 'Toggle' },
+]
 
 const isModalOpen = ref(false)
 const currentSim = ref('normal')
@@ -283,10 +396,6 @@ const activeFilterStyle = computed(() => {
   return 'none'
 })
 
-onMounted(() => {
-  if (titleRef.value) titleRef.value.innerText = previewTitle.value
-  if (bodyRef.value) bodyRef.value.innerText = previewText.value
-})
 
 function toggleEdit() {
   isEditing.value = !isEditing.value
