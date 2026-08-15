@@ -1,4 +1,3 @@
-// src/composables/useColorTokens.js
 import { computed } from 'vue'
 import { useStorage } from '@vueuse/core'
 
@@ -6,7 +5,7 @@ export function useColorTokens() {
   const bgColor = useStorage('chromatique-bg', '#D8D8DC')
   const textColor = useStorage('chromatique-text', '#111113')
   const activeFont = useStorage('chromatique-font', 'font-sans')
-  
+
   const savedPalettes = useStorage('chromatique-saved-palettes', [
     { name: 'Raw Linen', bg: '#D8D8DC', text: '#111113' },
     { name: 'Cast Iron', bg: '#1A1A1E', text: '#F4F4F6' },
@@ -51,22 +50,30 @@ export function useColorTokens() {
           textColor.value = result.sRGBHex
         }
       }
-    } catch (e) {
-      // User canceled eyedropper
+    } catch {
+      // user cancelled the eyedropper
     }
+  }
+
+  function hexToRgb(hex) {
+    let cleanHex = hex.replace('#', '')
+    if (cleanHex.length === 3) {
+      cleanHex = cleanHex.split('').map(c => c + c).join('')
+    }
+    const num = parseInt(cleanHex, 16)
+    return { r: (num >> 16) & 255, g: (num >> 8) & 255, b: num & 255 }
+  }
+
+  function rgbToHex(r, g, b) {
+    return '#' + [r, g, b].map(x => {
+      const hex = Math.round(Math.max(0, Math.min(255, x))).toString(16)
+      return hex.length === 1 ? '0' + hex : hex
+    }).join('').toUpperCase()
   }
 
   function getLuminance(hex) {
     try {
-      let cleanHex = hex.replace('#', '')
-      if (cleanHex.length === 3) {
-        cleanHex = cleanHex.split('').map(c => c + c).join('')
-      }
-      let rgb = parseInt(cleanHex, 16)
-      let r = (rgb >> 16) & 0xff
-      let g = (rgb >> 8) & 0xff
-      let b = (rgb >> 0) & 0xff
-      
+      const { r, g, b } = hexToRgb(hex)
       const a = [r, g, b].map(v => {
         v /= 255
         return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4)
@@ -77,25 +84,25 @@ export function useColorTokens() {
     }
   }
 
+  function apcaLuminance(hex) {
+    const { r, g, b } = hexToRgb(hex)
+    return (
+      0.2126729 * Math.pow(r / 255, 2.4) +
+      0.7151522 * Math.pow(g / 255, 2.4) +
+      0.0721750 * Math.pow(b / 255, 2.4)
+    )
+  }
+
   const contrastRatio = computed(() => {
     const lum1 = getLuminance(bgColor.value)
     const lum2 = getLuminance(textColor.value)
     const brightest = Math.max(lum1, lum2)
     const darkest = Math.min(lum1, lum2)
-    const ratio = (brightest + 0.05) / (darkest + 0.05)
-    return ratio.toFixed(2)
+    return ((brightest + 0.05) / (darkest + 0.05)).toFixed(2)
   })
 
   const isWcagAa = computed(() => parseFloat(contrastRatio.value) >= 4.5)
   const isWcagAaa = computed(() => parseFloat(contrastRatio.value) >= 7.0)
-
-  function apcaLuminance(hex) {
-    const { r, g, b } = hexToRgb(hex)
-    const rs = Math.pow(r / 255, 2.4)
-    const gs = Math.pow(g / 255, 2.4)
-    const bs = Math.pow(b / 255, 2.4)
-    return 0.2126729 * rs + 0.7151522 * gs + 0.0721750 * bs
-  }
 
   const apcaContrast = computed(() => {
     try {
@@ -118,22 +125,6 @@ export function useColorTokens() {
     if (lc >= 45) return 'Weak'
     return 'Fail'
   })
-
-  function hexToRgb(hex) {
-    let cleanHex = hex.replace('#', '')
-    if (cleanHex.length === 3) {
-      cleanHex = cleanHex.split('').map(c => c + c).join('')
-    }
-    const num = parseInt(cleanHex, 16)
-    return { r: (num >> 16) & 255, g: (num >> 8) & 255, b: num & 255 }
-  }
-
-  function rgbToHex(r, g, b) {
-    return '#' + [r, g, b].map(x => {
-      const hex = Math.round(Math.max(0, Math.min(255, x))).toString(16)
-      return hex.length === 1 ? '0' + hex : hex
-    }).join('').toUpperCase()
-  }
 
   const backgroundScale = computed(() => {
     try {
