@@ -1,6 +1,9 @@
 <!-- src/App.vue -->
 <template>
   <div class="min-h-screen bg-[#D8D8DC] text-[#111113] flex flex-col">
+    <!-- Mobile viewport gate — hides on md+ via CSS -->
+    <MobileGate />
+
     <!-- Pinned Top Header Component -->
     <Header />
 
@@ -324,6 +327,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import Header from './components/Header.vue'
 import Footer from './components/Footer.vue'
 import ExportModal from './components/ExportModal.vue'
+import MobileGate from './components/MobileGate.vue'
 import { useColorTokens } from './composables/useColorTokens'
 import { useClipboard } from '@vueuse/core'
 
