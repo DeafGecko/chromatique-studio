@@ -9,12 +9,12 @@
       <div class="w-full max-w-6xl rounded-3xl p-8 md:p-12 grid grid-cols-1 md:grid-cols-2 gap-12 bg-[#EFEFF2] border border-[#C4C4C9] shadow-lg items-start">
         
         <!-- Left Column: Controls & Presets -->
-        <section class="space-y-6 flex flex-col">
+        <section class="space-y-6 flex flex-col" aria-labelledby="palette-heading">
           
           <!-- Preset Palettes & Swatch Library -->
           <div class="space-y-2">
             <div class="flex justify-between items-center">
-              <span class="text-[12px] font-bold font-mono uppercase text-[#55555D] block">Color Palettes</span>
+              <h2 id="palette-heading" class="text-[12px] font-bold font-mono uppercase text-[#55555D] block">Color Palettes</h2>
               <div class="flex items-center gap-3">
                 <button @click="resetToDefault" class="text-[10px] font-mono uppercase text-[#55555D] hover:text-[#111113] transition-colors">
                   Reset Default
@@ -26,17 +26,18 @@
             </div>
             <div class="flex flex-wrap gap-2 max-h-32 overflow-y-auto p-1">
               <div v-for="(palette, index) in savedPalettes" :key="index"
-                  class="group relative flex items-center rounded-lg border border-[#C4C4C9] overflow-hidden shadow-sm"
+                  class="group relative flex items-center rounded-lg border border-[#767676] overflow-hidden shadow-sm"
                   :class="bgColor === palette.bg && textColor === palette.text ? 'bg-[#111113] text-white border-[#111113]' : 'bg-white text-[#111113]'">
                 <button @click="setPreset(palette.bg, palette.text)"
-                        class="px-3 py-1.5 text-[10px] font-mono font-semibold uppercase tracking-wider flex items-center gap-2 transition-colors"
+                  :aria-pressed="bgColor === palette.bg && textColor === palette.text"
+                        class="min-h-12 px-3 text-[10px] font-mono font-semibold uppercase tracking-wider flex items-center gap-2 transition-colors"
                         :class="bgColor === palette.bg && textColor === palette.text ? 'bg-[#111113] text-white' : 'hover:bg-[#111113] hover:text-white'">
                   <span class="w-3 h-3 rounded-full border border-[#C4C4C9]" :style="{ backgroundColor: palette.bg }"></span>
                   {{ palette.name }}
                 </button>
                 <button v-if="index >= 4" @click="deletePalette(index)" 
-                        class="px-2 text-[10px] font-mono text-red-600 hover:bg-red-50 h-full flex items-center justify-center border-l border-[#C4C4C9]" 
-                        aria-label="Delete Palette">
+                  class="min-h-12 min-w-12 text-base font-mono text-red-600 hover:bg-red-50 flex items-center justify-center border-l border-[#767676]" 
+                  :aria-label="`Delete ${palette.name} palette`">
                   ×
                 </button>
               </div>
@@ -45,12 +46,13 @@
           
           <!-- Color Blindness Preview -->
           <div class="space-y-2">
-            <span class="text-[12px] font-bold font-mono uppercase text-[#55555D] block">Color Blindness Preview</span>
+            <h2 class="text-[12px] font-bold font-mono uppercase text-[#55555D] block">Color Blindness Preview</h2>
             <div class="flex flex-wrap gap-2">
               <button v-for="mode in simModes" :key="mode.id"
                       @click="currentSim = mode.id"
+                      :aria-pressed="currentSim === mode.id"
                       class="px-3 py-1.5 rounded-lg border text-[10px] font-mono font-semibold uppercase tracking-wider transition-colors"
-                      :class="currentSim === mode.id ? 'bg-[#111113] text-white border-[#111113]' : 'bg-white text-[#111113] border-[#C4C4C9] hover:bg-[#D8D8DC]'">
+                      :class="currentSim === mode.id ? 'bg-[#111113] text-white border-[#111113]' : 'bg-white text-[#111113] border-[#767676] hover:bg-[#D8D8DC]'">
                 {{ mode.name }}
               </button>
             </div>
@@ -69,9 +71,9 @@
               <div class="flex flex-col min-w-0 flex-1">
                 <span class="text-[9px] font-mono uppercase text-[#55555D] mb-0.5 tracking-tight">Surface (Background Color)</span>
                 <div class="flex items-center justify-between gap-1">
-                  <input type="text" v-model="bgColor" aria-label="Background Hex Code" class="font-mono text-base bg-transparent focus:outline-none uppercase tracking-wide text-[#111113] w-24" />
-                  <button @click="pickColorFor('bg')" title="Sample color from screen" class="p-1.5 hover:text-black text-[#55555D] transition-colors cursor-pointer flex items-center justify-center shrink-0">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <input type="text" v-model="bgColor" aria-label="Background Hex Code" class="font-mono text-base bg-transparent uppercase tracking-wide text-[#111113] w-24" />
+                  <button @click="pickColorFor('bg')" aria-label="Sample background color from screen" title="Sample color from screen" class="p-1.5 hover:text-black text-[#55555D] transition-colors cursor-pointer flex items-center justify-center shrink-0">
+                    <svg aria-hidden="true" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
                     </svg>
                   </button>
@@ -89,9 +91,9 @@
               <div class="flex flex-col min-w-0 flex-1">
                 <span class="text-[9px] font-mono uppercase text-[#55555D] mb-0.5 tracking-tight">On-Surface (Text Color)</span>
                 <div class="flex items-center justify-between gap-1">
-                  <input type="text" v-model="textColor" aria-label="Text Hex Code" class="font-mono text-base bg-transparent focus:outline-none uppercase tracking-wide text-[#111113] w-24" />
-                  <button @click="pickColorFor('text')" title="Sample color from screen" class="p-1.5 hover:text-black text-[#55555D] transition-colors cursor-pointer flex items-center justify-center shrink-0">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <input type="text" v-model="textColor" aria-label="Text Hex Code" class="font-mono text-base bg-transparent uppercase tracking-wide text-[#111113] w-24" />
+                  <button @click="pickColorFor('text')" aria-label="Sample text color from screen" title="Sample color from screen" class="p-1.5 hover:text-black text-[#55555D] transition-colors cursor-pointer flex items-center justify-center shrink-0">
+                    <svg aria-hidden="true" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
                     </svg>
                   </button>
@@ -103,17 +105,19 @@
 
           <!-- Shade & Tint Generator Strip -->
           <div class="space-y-2 pt-2 border-t border-[#C4C4C9]">
-            <span class="text-[12px] font-bold font-mono uppercase text-[#55555D] block">Generated Scale (Shades & Tints)</span>
+            <h2 class="text-[12px] font-bold font-mono uppercase text-[#55555D] block">Generated Scale (Shades & Tints)</h2>
             <div class="grid grid-cols-9 gap-1 h-10 rounded-xl overflow-hidden border border-[#C4C4C9] bg-white p-1">
-              <div v-for="shade in backgroundScale" :key="shade.label"
+              <button v-for="shade in backgroundScale" :key="shade.label"
+                  type="button"
                   class="h-full rounded cursor-pointer transition-transform hover:scale-105 relative group"
                   :style="{ backgroundColor: shade.hex }"
                   @click="bgColor = shade.hex"
+                  :aria-label="`Use shade ${shade.label}, ${shade.hex}, as background color`"
                   :title="`${shade.label}: ${shade.hex}`">
-                <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block bg-[#111113] text-white text-[8px] font-mono px-1 py-0.5 rounded whitespace-nowrap z-10">
+                <span aria-hidden="true" class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block bg-[#111113] text-white text-[8px] font-mono px-1 py-0.5 rounded whitespace-nowrap z-10">
                   {{ shade.label }}
                 </span>
-              </div>
+              </button>
             </div>
           </div>
 
@@ -121,7 +125,7 @@
           <div class="grid grid-cols-3 gap-4 pt-4 border-t border-[#C4C4C9]">
             <div class="col-span-2 bg-white p-5 rounded-2xl border border-[#C4C4C9]">
               <span class="block text-[12px] font-bold font-mono text-[#55555D] uppercase mb-1">Contrast Ratio</span>
-              <span class="font-mono text-5xl font-extrabold tracking-tight text-[#111113] tabular-nums">
+              <span aria-live="polite" class="font-mono text-5xl font-extrabold tracking-tight text-[#111113] tabular-nums">
                 {{ contrastRatio }}<span class="text-3xl opacity-50">:1</span>
               </span>
               <div class="mt-3 pt-3 border-t border-[#C4C4C9]">
@@ -154,14 +158,14 @@
         </section>
 
         <!-- Right Column: Live Preview & Export -->
-        <section class="flex flex-col justify-between space-y-6">
+        <section class="flex flex-col justify-between space-y-6" aria-labelledby="preview-heading">
           <div class="space-y-4">
             <div class="flex justify-between items-center">
               <div class="flex items-center gap-3">
-                <span class="text-[12px] font-bold font-mono uppercase text-[#55555D]">Live Preview</span>
+                <h2 id="preview-heading" class="text-[12px] font-bold font-mono uppercase text-[#55555D]">Live Preview</h2>
 
                 <!-- Typography / Font Style Selector with Custom Theme Popup Options -->
-                <select v-model="activeFont" aria-label="Select typography style" class="text-[10px] font-bold font-mono rounded-lg px-3 py-1.5 focus:outline-none border border-[#C4C4C9] cursor-pointer [&>option]:bg-[#1E1E1E] [&>option]:text-white">
+                <select v-model="activeFont" aria-label="Select typography style" class="text-[10px] font-bold font-mono rounded-lg px-3 py-1.5 border border-[#767676] cursor-pointer [&>option]:bg-[#1E1E1E] [&>option]:text-white">
                   <option value="font-sans">Sans-Serif (Modern Clean)</option>
                   <option value="font-serif">Serif (Editorial Classic)</option>
                   <option value="font-mono">Monospace (Code Engineer)</option>
@@ -174,10 +178,12 @@
                   <span>Mode: {{ currentSim }}</span>
                 </div>
                 <button @click="toggleEdit" 
+                  :aria-pressed="isEditing"
+                  :aria-label="isEditing ? 'Finish editing preview text' : 'Edit preview text'"
                         class="p-1.5 transition-colors cursor-pointer flex items-center justify-center rounded-lg border"
                         :class="isEditing ? 'bg-blue-500 text-white border-blue-500' : 'hover:text-black text-[#55555D] border-transparent'" 
                         title="Toggle text editing mode">
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg aria-hidden="true" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                   </svg>
                 </button>
@@ -207,16 +213,17 @@
               <!-- VS Code Style Close (X) Button in Top Right Corner when Editing -->
               <button v-if="isEditing" @click="toggleEdit" 
                       class="absolute top-4 right-4 p-1.5 rounded-lg bg-[#2D2D2D] hover:bg-[#3C3C3C] text-gray-300 hover:text-white transition-colors cursor-pointer border border-[#444]"
+                    aria-label="Finish editing preview text"
                       title="Finish editing">
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg aria-hidden="true" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
 
               <!-- Added text-left and dir="ltr" to fix right-to-left typing bug -->
               <div class="space-y-6 text-left" dir="ltr">
-                <h2 ref="titleRef" :contenteditable="isEditing" @input="e => previewTitle = e.target.innerText" class="font-bold text-3xl tracking-tight leading-tight outline-none rounded px-1 -mx-1 wrap-break-word overflow-hidden text-left" dir="ltr"></h2>
-                <p ref="bodyRef" :contenteditable="isEditing" @input="e => previewText = e.target.innerText" class="text-base opacity-95 leading-relaxed outline-none rounded px-1 -mx-1 wrap-break-word overflow-hidden text-left" dir="ltr"></p>
+                <h3 ref="titleRef" :contenteditable="isEditing" :aria-label="isEditing ? 'Preview heading' : undefined" @input="e => previewTitle = e.target.innerText" class="font-bold text-3xl tracking-tight leading-tight outline-none rounded px-1 -mx-1 wrap-break-word overflow-hidden text-left" dir="ltr"></h3>
+                <p ref="bodyRef" :contenteditable="isEditing" :aria-label="isEditing ? 'Preview body text' : undefined" @input="e => previewText = e.target.innerText" class="text-base opacity-95 leading-relaxed outline-none rounded px-1 -mx-1 wrap-break-word overflow-hidden text-left" dir="ltr"></p>
               </div>
 
             </div>
@@ -224,12 +231,13 @@
 
           <!-- Component Switcher -->
           <div class="space-y-3 pt-4 border-t border-[#C4C4C9]">
-            <span class="text-[12px] font-bold font-mono uppercase text-[#55555D] block">Component Preview</span>
+            <h2 class="text-[12px] font-bold font-mono uppercase text-[#55555D] block">Component Preview</h2>
             <div class="flex gap-2 flex-wrap">
               <button v-for="c in componentPreviews" :key="c.id"
                       @click="activeComponent = c.id"
+                      :aria-pressed="activeComponent === c.id"
                       class="px-3 py-1.5 rounded-lg border text-[10px] font-mono font-semibold uppercase tracking-wider transition-colors"
-                      :class="activeComponent === c.id ? 'bg-[#111113] text-white border-[#111113]' : 'bg-white text-[#111113] border-[#C4C4C9] hover:bg-[#D8D8DC]'">
+                      :class="activeComponent === c.id ? 'bg-[#111113] text-white border-[#111113]' : 'bg-white text-[#111113] border-[#767676] hover:bg-[#D8D8DC]'">
                 {{ c.label }}
               </button>
             </div>
@@ -260,8 +268,8 @@
 
               <!-- Input -->
               <div v-else-if="activeComponent === 'input'" class="w-full max-w-xs space-y-2">
-                <label class="text-[10px] font-mono uppercase font-bold" :style="{ color: textColor }">Field Label</label>
-                <input type="text" placeholder="Placeholder text…"
+                <label for="component-preview-input" class="text-[10px] font-mono uppercase font-bold" :style="{ color: textColor }">Field Label</label>
+                <input id="component-preview-input" type="text" placeholder="Placeholder text…"
                        class="w-full px-4 py-2.5 rounded-xl text-sm font-mono border-2 outline-none"
                        :style="{ backgroundColor: bgColor, color: textColor, borderColor: textColor + '40' }" />
               </div>
@@ -284,9 +292,9 @@
           <!-- Export & Share -->
           <div class="flex justify-between items-center pt-4">
             <button @click="copyShareUrl"
-                    class="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider px-4 py-2.5 rounded-xl border border-[#C4C4C9] bg-white hover:bg-[#D8D8DC] transition-colors">
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
-              {{ shareCopied ? 'Copied!' : 'Share URL' }}
+                    class="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider px-4 py-2.5 rounded-xl border border-[#767676] bg-white hover:bg-[#D8D8DC] transition-colors">
+              <svg aria-hidden="true" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
+              <span aria-live="polite">{{ shareCopied ? 'Copied!' : 'Share URL' }}</span>
             </button>
             <button @click="openExportModal"
                     class="bg-[#111113] text-white hover:bg-[#333338] px-6 py-3 rounded-xl flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider shadow-sm">
