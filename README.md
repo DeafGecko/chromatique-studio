@@ -1,67 +1,72 @@
 # Chromatique Studio
 
-I built this to learn Vue. That's really it.
+Built this to learn Vue. That's it.
 
-I wanted a real project to practice on — not another todo app — so I made a color tool that lets you pick two colors, see if they actually work together, and export the results as real CSS or Tailwind tokens you could drop into a real project.
+Didn't want to do another todo app so I made something I'd actually use — two colors go in, you find out if they work, you take what you like and drop it into a real project as actual design tokens.
 
 ---
 
 ## What it does
 
-You pick a background color and a text color. The app tells you if they pass contrast standards (WCAG AA/AAA), shows you a live preview of how they look on screen, and lets you save pairings you like.
+Surface color on the left. On-surface color on the right. The app calculates WCAG AA/AAA contrast ratios and an APCA Lc score in real time, shows you a live preview with real editable text, and lets you save pairings to localStorage so they're still there when you come back.
 
-It's basically a workspace for testing "does this text color read on this background?" before you commit to it in your design.
+The question it answers: *does this text actually read on this background* — before you hard-code a hex value somewhere and find out the hard way.
 
 ---
 
-## What's built so far
+## What's in it
 
-**Color Palette Library & Swatch Panel**
-Save your color combos and come back to them. You can delete ones you don't want, load presets, and see which one is active by the black background highlight.
+**Palette Library**
+Your saved pairings live in localStorage. Delete what doesn't work, load back to anything you kept. The active pairing gets the solid black highlight so you always know where you are. First four presets are read-only defaults.
 
 **Shade & Tint Generator**
-Pick a color and it automatically builds a full 100–900 scale (like Tailwind's gray-100 through gray-900). You don't have to do that math yourself.
+Feed it your surface color, it builds the full 100–900 scale back out via HSL interpolation. Tailwind-style naming. Click any swatch and it becomes your new surface color. You see the whole tonal range at once.
 
-**Color Picker with Eyedropper**
-You can sample any color off your screen — like from a website or a design file — and it pulls the hex value directly into the tool.
+**Eyedropper**
+EyeDropper API. Sample any pixel on screen — open tab, Figma file, screenshot, whatever's in front of you — and it writes the hex straight into the reactive color ref. No copy-pasting.
 
-**Reset to Default**
-One click gets you back to the starting colors (`#D8D8DC` and `#111113`) when you've gone too far down a rabbit hole.
-
-**Live Preview (Edit Mode)**
-There's a preview card that shows how your colors actually look with real text. You can click into it and type your own words to test legibility. It goes into a VS Code-style dark editor mode with an X button to close out.
+**Live Preview**
+Inline styles bound to `bgColor` and `textColor` refs — what you see is exactly what those two values produce. Click the edit button and the preview goes `contenteditable`, VS Code dark editor style. Type your own words, see how legibility actually feels. X button exits and restores.
 
 **Typography Selector**
-Dropdown to switch between Sans-Serif, Serif, and Monospace so you can see how font style changes the feel of your color pair.
+A `v-model` bound select that swaps Tailwind font utility classes — `font-sans`, `font-serif`, `font-mono` — on the preview container. Same two colors look completely different in a different typeface. Worth checking.
 
-**Export Token Schema**
-When you find something you like, you can export it as CSS variables, a Tailwind config snippet, or W3C JSON. Copy button included.
+**Component Preview**
+Cards, badges, buttons, inputs, toggles — rendered with your actual tokens, driven by the same two color refs. No extra state. You see your palette on real UI shapes, not just a flat rectangle.
 
-**APCA Contrast Meter**
-Alongside WCAG AA/AAA scores, the app calculates an APCA (Accessible Perceptual Contrast Algorithm) Lc score. WCAG's contrast ratio is a symmetric formula that doesn't model how human vision actually perceives lightness — it can pass pale-on-white pairs and fail dark-on-dark pairs that look fine in practice. APCA accounts for that more accurately and returns a directional score (0–100+) with a plain-language rating: Excellent, Good, OK, Weak, or Fail. Both scores are shown side by side so you can see where they agree and where they don't.
+**WCAG + APCA Contrast**
+WCAG uses a symmetric relative luminance formula — it can pass pale-on-white combinations that look unreadable and fail dark pairs that look totally fine. APCA Lc is directional and closer to how human vision actually reads lightness and contrast. Both computed values live in a single `useColorTokens` composable. They run side by side so you can see where they agree and where they don't.
 
----
+**Export Modal**
+CSS custom properties. Tailwind `theme.extend.colors` config. W3C Design Token JSON. All three generated from the same two hex values. Copy to clipboard per format, drop it into your project.
 
-## What's coming next
-
-- **Contrast Fix Helper** — auto-suggests small tweaks to failing color pairs until they pass
-- **Component Switcher** — test your tokens on cards, badges, form inputs, and toggles inside the preview
-- **Typography Specimen** — see how your colors look across headings, body text, captions, and code
-- **Color History** — quick access to the last 5–10 combos you tested this session
-- **Shareable URL** — encode your active colors into a link you can send to someone
+**Shareable URL**
+`watch` on `[bgColor, textColor]` writes the active pair into the query string via `history.replaceState`. `onMounted` reads the params back on load. The URL is the state. Send it, paste it in Slack, drop it in a PR comment.
 
 ---
 
-## Why I built it this way
+## What's next
 
-Vue was new to me. I needed something with enough moving parts to actually learn — reactivity, components, composables, computed values — but with a clear enough goal that I wouldn't get lost. Color tools made sense because the feedback is instant and visual. You change something, you see it.
+- **Contrast Fix Helper** — auto-nudges failing pairs until they hit the threshold, shows you the adjusted hex
+- **Typography Specimen** — headings, body, caption, code — your full type scale rendered at once in your colors
+- **Color History** — reactive session log, last 5–10 pairs you tested, right there to step back through
 
-This is a learning project. The code will keep getting better as I get better at Vue.
+---
+
+## Why this way
+
+Vue was new to me. I needed a project with enough real surface area to actually learn the Composition API — `ref`, `computed`, `watch`, composables, props and emits — but a clear enough problem that I wouldn't lose the thread halfway through.
+
+Color tools made sense because the feedback is instant and visual. You change a value, something on screen changes. You can *see* if you broke it. That tight loop is good for learning something new.
+
+The code will keep getting better as I do.
 
 ---
 
 ## Stack
 
 - Vue 3 (Composition API)
-- Tailwind CSS
+- Tailwind CSS v3
 - Vite
+- VueUse (`useClipboard`)
+- APCA-W3 (`computeAPCA`)
