@@ -250,9 +250,9 @@
 
               <!-- Card -->
               <div v-if="activeComponent === 'card'" class="w-full max-w-xs rounded-xl p-5 shadow-sm border border-[#C4C4C9]" :style="{ backgroundColor: bgColor, color: textColor }">
-                <p class="text-[10px] font-mono uppercase opacity-60 mb-1">Label</p>
+                <p class="text-[10px] font-mono uppercase mb-1">Label</p>
                 <p class="font-bold text-lg leading-tight">Color Token Card</p>
-                <p class="text-sm opacity-80 mt-1">Preview text on your surface color.</p>
+                <p class="text-sm mt-1">Preview text on your surface color.</p>
               </div>
 
               <!-- Badge -->
