@@ -9,7 +9,7 @@
 
     <!-- Main Workstation Area -->
     <main class="flex-1 p-6 md:p-12 flex flex-col items-center justify-center">
-      <div class="w-full max-w-6xl rounded-3xl p-8 md:p-12 grid grid-cols-1 md:grid-cols-2 gap-12 bg-[#EFEFF2] border border-[#C4C4C9] shadow-lg items-start">
+      <div class="w-full max-w-6xl rounded-3xl p-8 md:p-12 grid grid-cols-1 md:grid-cols-2 gap-12 bg-[#EFEFF2] border border-[#C4C4C9] shadow-lg items-stretch">
         
         <!-- Left Column: Controls & Presets -->
         <section class="space-y-6 flex flex-col" aria-labelledby="palette-heading">
@@ -17,7 +17,7 @@
           <!-- Preset Palettes & Swatch Library -->
           <div class="space-y-2">
             <div class="flex justify-between items-center">
-              <h2 id="palette-heading" class="text-[12px] font-bold font-mono uppercase text-[#55555D] block">Color Palettes</h2>
+              <h2 id="palette-heading" class="text-[12px] font-bold font-heading uppercase text-[#55555D] block">Color Palettes</h2>
               <div class="flex items-center gap-3">
                 <button @click="resetToDefault" class="text-[10px] font-mono uppercase text-[#55555D] hover:text-[#111113] transition-colors">
                   Reset Default
@@ -49,7 +49,7 @@
           
           <!-- Color Blindness Preview -->
           <div class="space-y-2">
-            <h2 class="text-[12px] font-bold font-mono uppercase text-[#55555D] block">Color Blindness Preview</h2>
+            <h2 class="text-[12px] font-bold font-heading uppercase text-[#55555D] block">Color Blindness Preview</h2>
             <div class="flex flex-wrap gap-2">
               <button v-for="mode in simModes" :key="mode.id"
                       @click="currentSim = mode.id"
@@ -74,7 +74,7 @@
               <div class="flex flex-col min-w-0 flex-1">
                 <span class="text-[9px] font-mono uppercase text-[#55555D] mb-0.5 tracking-tight">Surface (Background Color)</span>
                 <div class="flex items-center justify-between gap-1">
-                  <input type="text" v-model="bgColor" aria-label="Background Hex Code" class="font-mono text-base bg-transparent uppercase tracking-wide text-[#111113] w-24" />
+                  <input ref="bgInputRef" type="text" v-model="bgColor" aria-label="Background Hex Code" class="font-mono text-base bg-transparent uppercase tracking-wide text-[#111113] w-24" />
                   <button @click="pickColorFor('bg')" aria-label="Sample background color from screen" title="Sample color from screen" class="p-1.5 hover:text-black text-[#55555D] transition-colors cursor-pointer flex items-center justify-center shrink-0">
                     <svg aria-hidden="true" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
@@ -108,7 +108,7 @@
 
           <!-- Shade & Tint Generator Strip -->
           <div class="space-y-2 pt-2 border-t border-[#C4C4C9]">
-            <h2 class="text-[12px] font-bold font-mono uppercase text-[#55555D] block">Generated Scale (Shades & Tints)</h2>
+            <h2 class="text-[12px] font-bold font-heading uppercase text-[#55555D] block">Generated Scale (Shades & Tints)</h2>
             <div class="grid grid-cols-9 gap-1 h-10 rounded-xl overflow-hidden border border-[#C4C4C9] bg-white p-1">
               <button v-for="shade in backgroundScale" :key="shade.label"
                   type="button"
@@ -125,12 +125,14 @@
           </div>
 
           <!-- Contrast Ratio & WCAG + APCA Badges -->
-          <div class="grid grid-cols-3 gap-4 pt-4 border-t border-[#C4C4C9]">
-            <div class="col-span-2 bg-white p-5 rounded-2xl border border-[#C4C4C9]">
-              <span class="block text-[12px] font-bold font-mono text-[#55555D] uppercase mb-1">Contrast Ratio</span>
-              <span aria-live="polite" class="font-mono text-5xl font-extrabold tracking-tight text-[#111113] tabular-nums">
-                {{ contrastRatio }}<span class="text-3xl opacity-50">:1</span>
-              </span>
+          <div class="grid grid-cols-3 gap-4 pt-4 border-t border-[#C4C4C9] flex-1">
+            <div class="col-span-2 bg-white p-5 rounded-2xl border border-[#C4C4C9] flex flex-col justify-between">
+              <div>
+                <span class="block text-[12px] font-bold font-mono text-[#55555D] uppercase mb-1">Contrast Ratio</span>
+                <span aria-live="polite" class="font-mono text-5xl font-extrabold tracking-tight text-[#111113] tabular-nums">
+                  {{ contrastRatio }}<span class="text-3xl opacity-50">:1</span>
+                </span>
+              </div>
               <div class="mt-3 pt-3 border-t border-[#C4C4C9]">
                 <span class="block text-[9px] font-mono uppercase text-[#55555D] mb-1">APCA Lc</span>
                 <div class="flex items-baseline gap-2">
@@ -145,18 +147,23 @@
             </div>
 
             <div class="flex flex-col gap-2">
-              <div class="p-3 rounded-xl text-center flex flex-col justify-center border border-[#C4C4C9]"
+              <div class="flex-1 p-3 rounded-xl text-center flex flex-col justify-center border border-[#C4C4C9]"
                     :class="isWcagAa ? 'bg-[#111113] text-white' : 'bg-white text-[#111113]'">
                 <span class="block text-[8px] font-mono uppercase tracking-wider opacity-70">WCAG AA</span>
                 <span class="font-mono text-sm font-bold">{{ isWcagAa ? 'PASS' : 'FAIL' }}</span>
               </div>
-              <div class="p-3 rounded-xl text-center flex flex-col justify-center border border-[#C4C4C9]"
+              <div class="flex-1 p-3 rounded-xl text-center flex flex-col justify-center border border-[#C4C4C9]"
                     :class="isWcagAaa ? 'bg-[#111113] text-white' : 'bg-white text-[#111113]'">
                 <span class="block text-[8px] font-mono uppercase tracking-wider opacity-70">WCAG AAA</span>
                 <span class="font-mono text-sm font-bold">{{ isWcagAaa ? 'PASS' : 'FAIL' }}</span>
               </div>
             </div>
           </div>
+
+          <!-- Keyboard shortcut legend: shown once a key is pressed -->
+          <ul v-if="keyboardUsed" class="flex flex-wrap gap-x-4 gap-y-1 text-[10px] font-mono uppercase text-[#55555D]" aria-label="Keyboard shortcuts">
+            <li v-for="item in shortcutLegend" :key="item.key"><kbd class="font-bold text-[#111113]">{{ item.key }}</kbd> {{ item.label }}</li>
+          </ul>
 
         </section>
 
@@ -165,7 +172,7 @@
           <div class="space-y-4">
             <div class="flex justify-between items-center">
               <div class="flex items-center gap-3">
-                <h2 id="preview-heading" class="text-[12px] font-bold font-mono uppercase text-[#55555D]">Live Preview</h2>
+                <h2 id="preview-heading" class="text-[12px] font-bold font-heading uppercase text-[#55555D]">Live Preview</h2>
 
                 <!-- Typography / Font Style Selector with Custom Theme Popup Options -->
                 <select v-model="activeFont" aria-label="Select typography style" class="text-[10px] font-bold font-mono rounded-lg px-3 py-1.5 border border-[#767676] cursor-pointer [&>option]:bg-[#1E1E1E] [&>option]:text-white">
@@ -226,7 +233,7 @@
               <!-- Added text-left and dir="ltr" to fix right-to-left typing bug -->
               <div class="space-y-6 text-left" dir="ltr">
                 <h3 ref="titleRef" :contenteditable="isEditing" :aria-label="isEditing ? 'Preview heading' : undefined" @input="e => previewTitle = e.target.innerText" class="font-bold text-3xl tracking-tight leading-tight outline-none rounded px-1 -mx-1 wrap-break-word overflow-hidden text-left" dir="ltr"></h3>
-                <p ref="bodyRef" :contenteditable="isEditing" :aria-label="isEditing ? 'Preview body text' : undefined" @input="e => previewText = e.target.innerText" class="text-base opacity-95 leading-relaxed outline-none rounded px-1 -mx-1 wrap-break-word overflow-hidden text-left" dir="ltr"></p>
+                <p ref="bodyRef" :contenteditable="isEditing" :aria-label="isEditing ? 'Preview body text' : undefined" @input="e => previewText = e.target.innerText" class="text-base leading-relaxed outline-none rounded px-1 -mx-1 wrap-break-word overflow-hidden text-left" dir="ltr"></p>
               </div>
 
             </div>
@@ -234,7 +241,7 @@
 
           <!-- Component Switcher -->
           <div class="space-y-3 pt-4 border-t border-[#C4C4C9]">
-            <h2 class="text-[12px] font-bold font-mono uppercase text-[#55555D] block">Component Preview</h2>
+            <h2 class="text-[12px] font-bold font-heading uppercase text-[#55555D] block">Component Preview</h2>
             <div class="flex gap-2 flex-wrap">
               <button v-for="c in componentPreviews" :key="c.id"
                       @click="activeComponent = c.id"
@@ -329,6 +336,7 @@ import Footer from './components/Footer.vue'
 import ExportModal from './components/ExportModal.vue'
 import MobileGate from './components/MobileGate.vue'
 import { useColorTokens } from './composables/useColorTokens'
+import { useKeyboardShortcuts } from './composables/useKeyboardShortcuts'
 import { useClipboard } from '@vueuse/core'
 
 const {
@@ -421,5 +429,18 @@ function toggleEdit() {
 function openExportModal() {
   isModalOpen.value = true
 }
+
+const bgInputRef = ref(null)
+const { keyboardUsed, legend: shortcutLegend } = useKeyboardShortcuts({
+  s: { label: 'Save pairing', handler: () => saveCurrentPalette() },
+  r: { label: 'Reset', handler: resetToDefault },
+  e: { label: 'Edit preview', handler: toggleEdit },
+  '/': { label: 'Focus background hex', handler: () => bgInputRef.value?.focus() },
+  escape: {
+    label: 'Exit edit',
+    allowInText: true,
+    handler: () => { if (isEditing.value) toggleEdit() },
+  },
+})
 
 </script>

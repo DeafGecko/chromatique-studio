@@ -20,3 +20,6 @@ body {
             animation-iteration-count: 1 !important;
       }
 }
+@theme {
+  --font-heading: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+}

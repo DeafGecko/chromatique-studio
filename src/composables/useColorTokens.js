@@ -84,13 +84,37 @@ export function useColorTokens() {
     }
   }
 
+  // APCA-W3 0.1.9 constants
+  const APCA = {
+    normBG: 0.56, normTXT: 0.57, revTXT: 0.62, revBG: 0.65,
+    blkThrs: 0.022, blkClmp: 1.414, scale: 1.14,
+    offset: 0.027, loClip: 0.1, deltaYmin: 0.0005
+  }
+
   function apcaLuminance(hex) {
     const { r, g, b } = hexToRgb(hex)
-    return (
+    const y = (
       0.2126729 * Math.pow(r / 255, 2.4) +
       0.7151522 * Math.pow(g / 255, 2.4) +
       0.0721750 * Math.pow(b / 255, 2.4)
     )
+    // soft clamp for near-black
+    return y > APCA.blkThrs ? y : y + Math.pow(APCA.blkThrs - y, APCA.blkClmp)
+  }
+
+  function apcaLc(bgHex, textHex) {
+    const yBg = apcaLuminance(bgHex)
+    const yTxt = apcaLuminance(textHex)
+    if (Math.abs(yBg - yTxt) < APCA.deltaYmin) return 0
+    let sapc
+    if (yBg > yTxt) {
+      // dark text on light background
+      sapc = (Math.pow(yBg, APCA.normBG) - Math.pow(yTxt, APCA.normTXT)) * APCA.scale
+      return sapc < APCA.loClip ? 0 : (sapc - APCA.offset) * 100
+    }
+    // light text on dark background
+    sapc = (Math.pow(yBg, APCA.revBG) - Math.pow(yTxt, APCA.revTXT)) * APCA.scale
+    return sapc > -APCA.loClip ? 0 : (sapc + APCA.offset) * 100
   }
 
   const contrastRatio = computed(() => {
@@ -106,12 +130,7 @@ export function useColorTokens() {
 
   const apcaContrast = computed(() => {
     try {
-      const lbg = apcaLuminance(bgColor.value)
-      const ltext = apcaLuminance(textColor.value)
-      const sapc = lbg > ltext
-        ? (Math.pow(lbg, 0.56) - Math.pow(ltext, 0.57)) * 1.14
-        : (Math.pow(lbg, 0.65) - Math.pow(ltext, 0.62)) * 1.14
-      return Math.abs(sapc * 100).toFixed(1)
+      return Math.abs(apcaLc(bgColor.value, textColor.value)).toFixed(1)
     } catch {
       return '0.0'
     }

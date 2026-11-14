@@ -20,13 +20,23 @@ The question it answers: *does this text actually read on this background* — b
 Your saved pairings live in localStorage. Delete what doesn't work, load back to anything you kept. The active pairing gets the solid black highlight so you always know where you are. First four presets are read-only defaults.
 
 **Shade & Tint Generator**
-Feed it your surface color, it builds the full 100–900 scale back out via HSL interpolation. Tailwind-style naming. Click any swatch and it becomes your new surface color. You see the whole tonal range at once.
+Feed it your surface color, it builds the full 100–900 scale by mixing toward white (100–400) and black (600–900) in RGB. Tailwind-style naming. Click any swatch and it becomes your new surface color. You see the whole tonal range at once.
 
 **Eyedropper**
 EyeDropper API. Sample any pixel on screen — open tab, Figma file, screenshot, whatever's in front of you — and it writes the hex straight into the reactive color ref. No copy-pasting.
 
 **Live Preview**
 Inline styles bound to `bgColor` and `textColor` refs — what you see is exactly what those two values produce. Click the edit button and the preview goes `contenteditable`, VS Code dark editor style. Type your own words, see how legibility actually feels. X button exits and restores.
+
+**Keyboard Shortcuts**
+Keys work without the mouse:
+
+- `S` saves the current pairing
+- `R` resets to Raw Linen
+- `E` toggles preview editing, `Escape` exits
+- `/` jumps to the background hex input
+
+Shortcuts are ignored while you're typing in a field, and when Ctrl, Cmd or Alt is held. A legend appears at the bottom of the controls once you press a key, so mouse-only visitors never see it. Logic lives in `useKeyboardShortcuts`.
 
 **Typography Selector**
 A `v-model` bound select that swaps Tailwind font utility classes — `font-sans`, `font-serif`, `font-mono` — on the preview container. Same two colors look completely different in a different typeface. Worth checking.
@@ -63,10 +73,33 @@ The code will keep getting better as I do.
 
 ---
 
+---
+
+## Testing
+
+```bash
+npm test             # unit tests (Vitest)
+npm run test:watch   # unit tests, watch mode
+npm run test:e2e     # browser tests and axe scans (Playwright)
+```
+
+- **Vitest + jsdom** runs the specs in `src/**/*.spec.js`, including `useColorTokens` and `useKeyboardShortcuts`. The Vue plugin is loaded so components can be imported in tests.
+- **Playwright** runs `e2e/` against a Vite dev server on port 4173, started automatically. Each run uses headless Chromium. `@axe-core/playwright` runs accessibility scans, and the spec also checks tab order, focus outlines, contrast results, and shortcuts.
+- Install browsers once with `npx playwright install chromium`.
+- **Lighthouse** isn't wired into a script. Run it against the production build, not the dev server, since dev-mode code skews the scores: `npm run build && npx vite preview --port 4174`, then point Lighthouse at `http://localhost:4174`.
+
+Current status: 30/30 unit tests, 11/11 browser tests (including axe scans), and Lighthouse 100 across Performance, Accessibility, Best Practices, and SEO on the production build.
+
+---
+
 ## Stack
 
 - Vue 3 (Composition API)
-- Tailwind CSS v3
+- Tailwind CSS v4 (via `@tailwindcss/vite`)
+- Inter (self-hosted via `@fontsource-variable/inter`) for section headings
 - Vite
-- VueUse (`useClipboard`)
-- APCA-W3 (`computeAPCA`)
+- VueUse (`useStorage`, `useClipboard`)
+- Vitest, @vue/test-utils, jsdom
+- Playwright, @axe-core/playwright
+
+APCA-W3 is calculated in `useColorTokens` (soft black clamp, 0.027 offset, 0.1 cutoff), not from a library.
