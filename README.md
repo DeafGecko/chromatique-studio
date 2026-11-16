@@ -84,11 +84,11 @@ npm run test:e2e     # browser tests and axe scans (Playwright)
 ```
 
 - **Vitest + jsdom** runs the specs in `src/**/*.spec.js`, including `useColorTokens` and `useKeyboardShortcuts`. The Vue plugin is loaded so components can be imported in tests.
-- **Playwright** runs `e2e/` against a Vite dev server on port 5199, started automatically. The port is fixed and never reused, so the tests can't attach to another project's server. Each run uses headless Chromium. `@axe-core/playwright` runs accessibility scans, and the spec also checks tab order, focus outlines, contrast results, and shortcuts.
+- **Playwright** runs `e2e/` against a Vite dev server on port 5199, started automatically. The port is fixed and never reused, so the tests can't attach to another project's server. Each run uses headless Chromium. `@axe-core/playwright` runs WCAG 2.0 and 2.1 A and AA scans on every preset, each color-blindness mode, edit mode, and the export modal. The spec also checks tab order, focus outlines, contrast results, and shortcuts.
 - Install browsers once with `npx playwright install chromium`.
 - **Lighthouse** isn't wired into a script. Run it against the production build, not the dev server, since dev-mode code skews the scores: `npm run build && npx vite preview --port 4174`, then point Lighthouse at `http://localhost:4174`.
 
-Current status: 30/30 unit tests, 11/11 browser tests (including axe scans), and Lighthouse 100 across Performance, Accessibility, Best Practices, and SEO on the production build.
+Current status: 30/30 unit tests, 16/16 browser tests (including axe scans against WCAG 2.0 and 2.1 A and AA), and Lighthouse 100 across Performance, Accessibility, Best Practices, and SEO on the production build.
 
 ---
 
