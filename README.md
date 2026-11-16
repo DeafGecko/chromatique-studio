@@ -1,81 +1,85 @@
 # Chromatique Studio
 
-Built this to learn Vue. That's it.
+A small tool for testing two colors before you hard-code them. Pick a surface color and a text color, see whether they read, and export them as real design tokens.
 
-Didn't want to do another todo app so I made something I'd actually use — two colors go in, you find out if they work, you take what you like and drop it into a real project as actual design tokens.
+Built to learn Vue. Kept going because it's something I actually use.
+
+Live at [chroma.09labs.dev](https://chroma.09labs.dev).
 
 ---
 
 ## What it does
 
-Surface color on the left. On-surface color on the right. The app calculates WCAG AA/AAA contrast ratios and an APCA Lc score in real time, shows you a live preview with real editable text, and lets you save pairings to localStorage so they're still there when you come back.
+Surface color on the left, on-surface color on the right. The app calculates WCAG AA and AAA contrast ratios and an APCA Lc score as you type or pick, and shows them side by side. You see where the two measures agree and where they don't.
 
-The question it answers: *does this text actually read on this background* — before you hard-code a hex value somewhere and find out the hard way.
+It answers one question: *does this text actually read on this background?* Answer it before you write a hex value into a stylesheet.
+
+Everything sits on one card. On desktop and iPad the whole tool fits the screen without scrolling. On a phone the sections stack and you scroll.
 
 ---
 
-## What's in it
+## Features
 
-**Palette Library**
-Your saved pairings live in localStorage. Delete what doesn't work, load back to anything you kept. The active pairing gets the solid black highlight so you always know where you are. First four presets are read-only defaults.
+**Contrast readout**
+WCAG ratio, AA and AAA pass or fail, APCA Lc, and a rating label. WCAG is symmetric and can pass pale-on-white pairs that look unreadable. APCA is directional and closer to how people perceive lightness. Both run in `useColorTokens`.
 
-**Shade & Tint Generator**
-Feed it your surface color, it builds the full 100–900 scale by mixing toward white (100–400) and black (600–900) in RGB. Tailwind-style naming. Click any swatch and it becomes your new surface color. You see the whole tonal range at once.
+**Live preview**
+The preview is styled from the same two values, so what you see is what they produce. Click the edit button to type your own copy into the preview. The X button exits and restores.
+
+**Component preview**
+Cards, badges, buttons, inputs, and toggles rendered with your tokens.
+
+**Color-blindness preview**
+Protanopia, deuteranopia, and tritanopia filters on the preview.
+
+**Shade and tint scale**
+A 100–900 scale built by mixing the surface color toward white and black. Click a swatch to make it the new surface color.
+
+**Palettes**
+Four read-only presets. Save any pairing to localStorage, delete what you don't need, and load any saved pairing back in.
 
 **Eyedropper**
-EyeDropper API. Sample any pixel on screen — open tab, Figma file, screenshot, whatever's in front of you — and it writes the hex straight into the reactive color ref. No copy-pasting.
+Samples a color from anywhere on screen, where the browser supports the EyeDropper API.
 
-**Live Preview**
-Inline styles bound to `bgColor` and `textColor` refs — what you see is exactly what those two values produce. Click the edit button and the preview goes `contenteditable`, VS Code dark editor style. Type your own words, see how legibility actually feels. X button exits and restores.
+**Typography**
+Switch the preview between sans-serif, serif, and monospace. The same two colors look different in each.
 
-**Keyboard Shortcuts**
-Keys work without the mouse:
-
-- `S` saves the current pairing
-- `R` resets to Raw Linen
-- `E` toggles preview editing, `Escape` exits
-- `/` jumps to the background hex input
-
-Shortcuts are ignored while you're typing in a field, and when Ctrl, Cmd or Alt is held. A legend appears at the bottom of the controls once you press a key, so mouse-only visitors never see it. Logic lives in `useKeyboardShortcuts`.
-
-**Typography Selector**
-A `v-model` bound select that swaps Tailwind font utility classes — `font-sans`, `font-serif`, `font-mono` — on the preview container. Same two colors look completely different in a different typeface. Worth checking.
-
-**Component Preview**
-Cards, badges, buttons, inputs, toggles — rendered with your actual tokens, driven by the same two color refs. No extra state. You see your palette on real UI shapes, not just a flat rectangle.
-
-**WCAG + APCA Contrast**
-WCAG uses a symmetric relative luminance formula — it can pass pale-on-white combinations that look unreadable and fail dark pairs that look totally fine. APCA Lc is directional and closer to how human vision actually reads lightness and contrast. Both computed values live in a single `useColorTokens` composable. They run side by side so you can see where they agree and where they don't.
-
-**Export Modal**
-CSS custom properties. Tailwind `theme.extend.colors` config. W3C Design Token JSON. All three generated from the same two hex values. Copy to clipboard per format, drop it into your project.
+**Export**
+CSS custom properties, a Tailwind `theme.extend.colors` config, and W3C Design Token JSON, all from the same two hex values.
 
 **Shareable URL**
-`watch` on `[bgColor, textColor]` writes the active pair into the query string via `history.replaceState`. `onMounted` reads the params back on load. The URL is the state. Send it, paste it in Slack, drop it in a PR comment.
+The active pair is written to the query string. Send the link and the other person sees the same pair.
+
+**Keyboard shortcuts**
+
+| Key | Action |
+|---|---|
+| `S` | Save the current pairing |
+| `R` | Reset to Raw Linen |
+| `E` | Toggle preview editing |
+| `/` | Focus the background hex input |
+| `Escape` | Exit preview editing |
+
+Shortcuts are ignored while you're typing in a field and when Ctrl, Cmd, or Alt is held. A legend appears after your first key press, so mouse users never see it.
 
 ---
 
-## What's next
+## Accessibility
 
-- **Contrast Fix Helper** — auto-nudges failing pairs until they hit the threshold, shows you the adjusted hex
-- **Typography Specimen** — headings, body, caption, code — your full type scale rendered at once in your colors
-- **Color History** — reactive session log, last 5–10 pairs you tested, right there to step back through
-
----
-
-## Why this way
-
-Vue was new to me. I needed a project with enough real surface area to actually learn the Composition API — `ref`, `computed`, `watch`, composables, props and emits — but a clear enough problem that I wouldn't lose the thread halfway through.
-
-Color tools made sense because the feedback is instant and visual. You change a value, something on screen changes. You can *see* if you broke it. That tight loop is good for learning something new.
-
-The code will keep getting better as I do.
+- Keyboard focus shows a visible outline. Tab order and focus were checked on the main controls.
+- The browser tests scan every preset, each color-blindness mode, edit mode, and the export modal with axe, against WCAG 2.0 and 2.1 A and AA.
+- Automated checks can't replace a manual pass with a screen reader. That hasn't been done yet.
 
 ---
 
----
+## Running it
 
-## Testing
+```bash
+npm install
+npm run dev          # http://localhost:5173 (or the next free port)
+```
+
+### Tests
 
 ```bash
 npm test             # unit tests (Vitest)
@@ -83,12 +87,11 @@ npm run test:watch   # unit tests, watch mode
 npm run test:e2e     # browser tests and axe scans (Playwright)
 ```
 
-- **Vitest + jsdom** runs the specs in `src/**/*.spec.js`, including `useColorTokens` and `useKeyboardShortcuts`. The Vue plugin is loaded so components can be imported in tests.
-- **Playwright** runs `e2e/` against a Vite dev server on port 5199, started automatically. The port is fixed and never reused, so the tests can't attach to another project's server. Each run uses headless Chromium. `@axe-core/playwright` runs WCAG 2.0 and 2.1 A and AA scans on every preset, each color-blindness mode, edit mode, and the export modal. The spec also checks tab order, focus outlines, contrast results, and shortcuts.
-- Install browsers once with `npx playwright install chromium`.
+- **Unit tests** run from `src/**/*.spec.js` with Vitest and jsdom. They cover `useColorTokens` and `useKeyboardShortcuts`. The Vue plugin is loaded, so components can be imported in tests.
+- **Browser tests** run from `e2e/` against a Vite server on port 5199, started automatically. The port is fixed and never reused, so the tests can't attach to another project's server. Install the browser once with `npx playwright install chromium`.
 - **Lighthouse** isn't wired into a script. Run it against the production build, not the dev server, since dev-mode code skews the scores: `npm run build && npx vite preview --port 4174`, then point Lighthouse at `http://localhost:4174`.
 
-Current status: 30/30 unit tests, 16/16 browser tests (including axe scans against WCAG 2.0 and 2.1 A and AA), and Lighthouse 100 across Performance, Accessibility, Best Practices, and SEO on the production build.
+Last full run: 30 of 30 unit tests, 16 of 16 browser tests, and Lighthouse at 100 in Performance, Accessibility, Best Practices, and SEO.
 
 ---
 
@@ -96,10 +99,27 @@ Current status: 30/30 unit tests, 16/16 browser tests (including axe scans again
 
 - Vue 3 (Composition API)
 - Tailwind CSS v4 (via `@tailwindcss/vite`)
-- Inter (self-hosted via `@fontsource-variable/inter`) for section headings
 - Vite
 - VueUse (`useStorage`, `useClipboard`)
+- Inter for section headings, self-hosted via `@fontsource-variable/inter`
 - Vitest, @vue/test-utils, jsdom
 - Playwright, @axe-core/playwright
 
-APCA-W3 is calculated in `useColorTokens` (soft black clamp, 0.027 offset, 0.1 cutoff), not from a library.
+APCA-W3 is calculated in `useColorTokens` (soft black clamp, 0.027 offset, 0.1 cutoff) rather than from a library.
+
+---
+
+## What's next
+
+- **Accent color:** a third picker with suggestions that already pass contrast against the surface.
+- **Contrast fix helper:** nudges a failing pair until it passes, and shows the adjusted hex.
+- **Typography specimen:** headings, body, caption, and code, rendered together in your colors.
+- **Color history:** the last 5–10 pairs you tested, so you can step back through them.
+
+---
+
+## Why this way
+
+Vue was new to me. I needed a project with enough real surface area to learn the Composition API (`ref`, `computed`, `watch`, composables, props and emits), and a problem clear enough that I wouldn't lose the thread.
+
+Color tools made sense because the feedback is instant. You change a value and something on screen changes.

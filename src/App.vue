@@ -3,15 +3,15 @@
   <div class="min-h-dvh md:h-dvh flex items-center justify-center p-3 md:p-4 bg-[#D8D8DC] text-[#111113]">
     <!-- One workspace card: title, controls, preview, footer -->
     <main class="w-full max-w-6xl md:h-full flex flex-col rounded-3xl bg-[#EFEFF2] border border-[#C4C4C9] shadow-lg overflow-hidden">
-      <div class="flex items-center gap-3 px-6 md:px-8 py-4 border-b border-[#C4C4C9]">
+      <div class="flex items-center gap-3 px-6 md:px-8 py-3 xl:py-4 border-b border-[#C4C4C9]">
         <div class="w-4 h-4 rounded-full bg-[#111113] border border-[#C4C4C9]" aria-hidden="true"></div>
         <h1 class="font-mono tracking-wider text-sm font-bold uppercase text-[#55555D]">Chromatique Studio</h1>
       </div>
 
-      <div class="flex-1 min-h-0 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 p-6 md:p-8 md:overflow-y-auto items-stretch">
+      <div class="flex-1 min-h-0 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 xl:gap-8 p-4 md:p-5 xl:p-8 md:overflow-y-auto items-stretch">
         
         <!-- Left Column: Controls & Presets -->
-        <section class="space-y-4 md:space-y-5 flex flex-col min-h-0" aria-labelledby="palette-heading">
+        <section class="space-y-3 md:space-y-4 xl:space-y-5 flex flex-col min-h-0" aria-labelledby="palette-heading">
           
           <!-- Preset Palettes & Swatch Library -->
           <div class="space-y-2">
@@ -167,7 +167,7 @@
         </section>
 
         <!-- Right Column: Live Preview & Export -->
-        <section class="flex flex-col min-h-0 gap-4 md:gap-5" aria-labelledby="preview-heading">
+        <section class="flex flex-col min-h-0 gap-3 md:gap-4 xl:gap-5" aria-labelledby="preview-heading">
           <div class="space-y-4 flex-1 min-h-0 flex flex-col">
             <div class="flex justify-between items-center">
               <div class="flex items-center gap-3">
@@ -239,7 +239,7 @@
           </div>
 
           <!-- Component Switcher -->
-          <div class="space-y-2 md:space-y-3 pt-3 border-t border-[#C4C4C9]">
+          <div class="space-y-2 md:space-y-2 xl:space-y-3 pt-3 border-t border-[#C4C4C9]">
             <h2 class="text-[12px] font-bold font-heading uppercase text-[#55555D] block">Component Preview</h2>
             <div class="flex gap-2 flex-wrap">
               <button v-for="c in componentPreviews" :key="c.id"
