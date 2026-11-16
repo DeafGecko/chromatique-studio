@@ -1,18 +1,17 @@
 <!-- src/App.vue -->
 <template>
-  <div class="min-h-screen bg-[#D8D8DC] text-[#111113] flex flex-col">
-    <!-- Mobile viewport gate — hides on md+ via CSS -->
-    <MobileGate />
+  <div class="min-h-dvh md:h-dvh flex items-center justify-center p-3 md:p-4 bg-[#D8D8DC] text-[#111113]">
+    <!-- One workspace card: title, controls, preview, footer -->
+    <main class="w-full max-w-6xl md:h-full flex flex-col rounded-3xl bg-[#EFEFF2] border border-[#C4C4C9] shadow-lg overflow-hidden">
+      <div class="flex items-center gap-3 px-6 md:px-8 py-4 border-b border-[#C4C4C9]">
+        <div class="w-4 h-4 rounded-full bg-[#111113] border border-[#C4C4C9]" aria-hidden="true"></div>
+        <h1 class="font-mono tracking-wider text-sm font-bold uppercase text-[#55555D]">Chromatique Studio</h1>
+      </div>
 
-    <!-- Pinned Top Header Component -->
-    <Header />
-
-    <!-- Main Workstation Area -->
-    <main class="flex-1 p-6 md:p-12 flex flex-col items-center justify-center">
-      <div class="w-full max-w-6xl rounded-3xl p-8 md:p-12 grid grid-cols-1 md:grid-cols-2 gap-12 bg-[#EFEFF2] border border-[#C4C4C9] shadow-lg items-stretch">
+      <div class="flex-1 min-h-0 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 p-6 md:p-8 md:overflow-y-auto items-stretch">
         
         <!-- Left Column: Controls & Presets -->
-        <section class="space-y-6 flex flex-col" aria-labelledby="palette-heading">
+        <section class="space-y-4 md:space-y-5 flex flex-col min-h-0" aria-labelledby="palette-heading">
           
           <!-- Preset Palettes & Swatch Library -->
           <div class="space-y-2">
@@ -168,8 +167,8 @@
         </section>
 
         <!-- Right Column: Live Preview & Export -->
-        <section class="flex flex-col justify-between space-y-6" aria-labelledby="preview-heading">
-          <div class="space-y-4">
+        <section class="flex flex-col min-h-0 gap-4 md:gap-5" aria-labelledby="preview-heading">
+          <div class="space-y-4 flex-1 min-h-0 flex flex-col">
             <div class="flex justify-between items-center">
               <div class="flex items-center gap-3">
                 <h2 id="preview-heading" class="text-[12px] font-bold font-heading uppercase text-[#55555D]">Live Preview</h2>
@@ -216,7 +215,7 @@
             </svg>
 
             <!-- Applied Preview Box with VS Code Style Dark Background & Close Button when Editing -->
-            <div class="relative p-8 md:p-10 rounded-2xl border-2 space-y-6 shadow-inner transition-all duration-150 min-h-95 flex flex-col justify-between"
+            <div class="relative p-6 md:p-8 rounded-2xl border-2 space-y-6 shadow-inner transition-all duration-150 flex-1 min-h-40 flex flex-col justify-between"
                   :style="isEditing ? { backgroundColor: '#1E1E1E', color: '#FFFFFF', filter: 'none' } : { backgroundColor: bgColor, color: textColor, filter: activeFilterStyle }"
                   :class="[activeFont, isEditing ? 'border-blue-500 ring-4 ring-blue-500/20' : 'border-[#C4C4C9]']">
                   
@@ -240,7 +239,7 @@
           </div>
 
           <!-- Component Switcher -->
-          <div class="space-y-3 pt-4 border-t border-[#C4C4C9]">
+          <div class="space-y-2 md:space-y-3 pt-3 border-t border-[#C4C4C9]">
             <h2 class="text-[12px] font-bold font-heading uppercase text-[#55555D] block">Component Preview</h2>
             <div class="flex gap-2 flex-wrap">
               <button v-for="c in componentPreviews" :key="c.id"
@@ -253,7 +252,7 @@
             </div>
 
             <!-- Component renders -->
-            <div class="p-6 rounded-2xl border border-[#C4C4C9] bg-white flex items-center justify-center min-h-28">
+            <div class="p-4 md:p-6 rounded-2xl border border-[#C4C4C9] bg-white flex items-center justify-center min-h-24 md:min-h-28">
 
               <!-- Card -->
               <div v-if="activeComponent === 'card'" class="w-full max-w-xs rounded-xl p-5 shadow-sm border border-[#C4C4C9]" :style="{ backgroundColor: bgColor, color: textColor }">
@@ -300,7 +299,7 @@
           </div>
 
           <!-- Export & Share -->
-          <div class="flex justify-between items-center pt-4">
+          <div class="flex justify-between items-center pt-2">
             <button @click="copyShareUrl"
                     class="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider px-4 py-2.5 rounded-xl border border-[#767676] bg-white hover:bg-[#D8D8DC] transition-colors">
               <svg aria-hidden="true" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
@@ -314,9 +313,9 @@
         </section>
 
       </div>
-    </main>
 
-    <Footer />
+      <Footer />
+    </main>
 
     <!-- Export Modal Component -->
     <ExportModal 
@@ -331,10 +330,8 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
-import Header from './components/Header.vue'
 import Footer from './components/Footer.vue'
 import ExportModal from './components/ExportModal.vue'
-import MobileGate from './components/MobileGate.vue'
 import { useColorTokens } from './composables/useColorTokens'
 import { useKeyboardShortcuts } from './composables/useKeyboardShortcuts'
 import { useClipboard } from '@vueuse/core'
